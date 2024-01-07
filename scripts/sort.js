@@ -1,3 +1,4 @@
+// convert viewer count text to int
 const convertNumTextToInt = (text) => {
   // considering the case if it goes till K
   if (text.toLowerCase().indexOf('k') !== -1) {
@@ -6,6 +7,16 @@ const convertNumTextToInt = (text) => {
   return parseInt(text);
 };
 
+// to ensure functions run and don't fail due to following channels not loaded
+const functionWrapper = (count, functionToWrap, timeout) => {
+  try {
+    functionToWrap();
+  } catch (err) {
+    setTimeout(() => functionWrapper(count + 1), timeout);
+  }
+};
+
+// convert data of streamer from channel div
 const getChannelInfo = (channel) => {
   const text = channel.innerText;
   const details = text.split('\n').filter((e) => e !== '');
@@ -49,12 +60,10 @@ const defaultSortingFunction = (channel1Element, channel2Element) => {
     return channel1.game > channel2.game;
   }
   // return compare on names
-  return channel1.streamer > channel2.streamer
-
+  return channel1.streamer > channel2.streamer;
 };
 
 const mainFunction = () => {
-  console.debug('here')
   const followedChannelsParentDiv = document.querySelectorAll(
     '.side-nav-section[aria-label="Followed Channels"]'
   )[0];
@@ -73,28 +82,35 @@ const mainFunction = () => {
 
   const sortedChannels = channels.toSorted(defaultSortingFunction);
   followedChannelsDiv.replaceChildren(...sortedChannels);
-  
+
   // console.log({ channels, sortedChannels });
   // console.log(channels);
   // console.log(sortedChannels);
-  
+
   // const sortedChannels = channels.map((channelElement))
   // followedChannelsDiv = document.querySelectorAll('.side-nav-section[aria-label="Followed Channels"]')[0].children[1]
   // channels = Array.from(followedChannelsDiv.children)
 };
 
-const eventFunction = (count) => {
-  console.debug(count)
-  try {
-    mainFunction()
-  }
-  catch(err) {
-    setTimeout(() => eventFunction(count + 1), 2000)
-  }
-}
+const addListenerOnShowButtons = () => {
+  // should sort on show more click
+  const followedChannelsParentDiv = document.querySelectorAll(
+    '.side-nav-section[aria-label="Followed Channels"]'
+  )[0];
 
-eventFunction(0)
+  const showButtonsDiv =
+    followedChannelsParentDiv.childNodes[
+      followedChannelsParentDiv.childNodes.length - 1
+    ];
+  showButtonsDiv.addEventListener('click', () =>
+    // wait for transition to end
+    setTimeout(() => functionWrapper(0, mainFunction, 2000), 250)
+  );
+};
 
+// apply functions
+functionWrapper(0, mainFunction, 2000);
+functionWrapper(0, addListenerOnShowButtons, 2000);
 
 // // run only when page loads
 // window.addEventListener('load', eventFunction, false);
