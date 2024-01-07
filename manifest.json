@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
   "name": "Twitch Channel Manager",
-  "version": "0.1",
+  "version": "0.1.0",
 
-  "description": "Your one stop manager for handling channel on twitch. Sort channels ",
+  "description": "Your one stop manager for handling channel on twitch. Sort and group channels according to your needs.",
 
   "icons": {
     "48": "icons/sort-icon.png"
